@@ -1,4 +1,6 @@
 import Vapor
+import Foundation
+import Network
 
 func routes(_ app: Application) throws {
     // MARK: GET
@@ -24,10 +26,24 @@ func routes(_ app: Application) throws {
         return currentDate
     }
     
+    app.get("counter", ":number") { req async -> CounterJson in
+        let num = try! req.parameters.require("number")
+        guard let val = Int(num) else {
+            return CounterJson(count: nil)
+        }
+        return CounterJson(count: Int(val))
+    }
+    
     // MARK: POST
     app.post("info") { req -> InfoResponse in
         let data = try req.content.decode(InfoData.self)
         return InfoResponse(request: data)
+    }
+    
+    app.post("user-info") { req  -> User in
+        let user = try! req.content.decode(User.self)
+        print(type(of: user))
+        return user
     }
 }
 
@@ -40,6 +56,16 @@ struct InfoResponse: Content {
     let request: InfoData
 }
 
+struct CounterJson: Content {
+    let count: Int?
+}
+
+struct User: Content {
+    var name: String = "default"
+    var age: Int
+}
+
+// MARK: Helper functions
 func formatDate() -> String {
     let months : [String] = ["January","Febrary","March","April","May","June","July","August","September","October","November","December"]
     let date = Date()
