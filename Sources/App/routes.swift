@@ -43,7 +43,9 @@ func routes(_ app: Application) throws {
     app.post("user-info") { req  -> User in
         let user = try! req.content.decode(User.self)
         print(type(of: user))
-        return user
+        let name = user.name
+        let age = user.age
+        return User(name: name, age: age, description: "\(name) you are \(age) years old")
     }
 }
 
@@ -63,6 +65,7 @@ struct CounterJson: Content {
 struct User: Content {
     var name: String = "default"
     var age: Int
+    let description: String? // this is optional
 }
 
 // MARK: Helper functions
